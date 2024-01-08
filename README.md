@@ -1,21 +1,35 @@
 # @qavajs/soft-assertion
-Module that enables soft assertions in qavajs framework
+Soft assertions for qavajs frameworks
 
 ## Installation
 `npm install @qavajs/soft-assertion`
 
 ## Usage
    
-Add module to requireModule and set activation tag (default is @softAssert). 
-Soft assertion change behavior of Cucumber and Then steps will not cause test case failure.
+Add module to requireModule and set activation tag (default is _@softAssert_). 
+Soft assertion change behavior of CucumberJS and _Then_ steps will not cause test case failure.
 ```javascript
 module.exports = {
     default: {
         requireModule: [
             '@qavajs/soft-assertion'
         ],
-        softAssertTag: '@yourTag' 
+        softAssertTag: '@softAssert' 
     }
 }
+```
 
+```gherkin
+Feature: Feature
+
+  @softAssert
+  Scenario: verify soft assert
+    # first step fails but other steps will not be skipped
+    Then I expect '2' to equal '1'
+    # pass
+    And I expect '1' to equal '1'
+    # fail
+    And I expect '2' to equal '1'
+    # pass
+    And I expect '1' to equal '1'
 ```
