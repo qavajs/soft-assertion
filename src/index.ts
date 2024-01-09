@@ -15,20 +15,14 @@ type TestStepResultType = {
 
 declare global {
     // eslint-disable-next-line no-var
-    var config: any;
+    var config: { softAssertTag?: string };
 }
 
 const originIsSkippingSteps = TestCaseRunner.prototype.isSkippingSteps;
 // patch isSkippingStep method
-TestCaseRunner.prototype.isSkippingSteps = function () {
+TestCaseRunner.prototype.isSkippingSteps = function (this: TestCaseRunner) {
     // @ts-ignore
-    const pickle = this.pickle;
-    // @ts-ignore
-    const testStepResults = this.testStepResults;
-    // @ts-ignore
-    const testCase = this.testCase;
-    // @ts-ignore
-    const currentTestStepId = this.currentTestStepId;
+    const { pickle, testStepResults, testCase, currentTestStepId } = this;
 
     const activationTag = global?.config?.softAssertTag ?? '@softAssert';
     const isSoftAssertEnabled = pickle.tags.find((tag: PickleTag) => tag.name === activationTag);
@@ -44,7 +38,7 @@ TestCaseRunner.prototype.isSkippingSteps = function () {
 
     const isNotOutcomeFailed = testStepResultsTypes.find((result: TestStepResultType) =>
         result.status !== TestStepResultStatus.PASSED && result.type !== StepKeywordType.OUTCOME
-    )
+    );
     const currentTestStep = testCase.testSteps.find((step: TestStep) => step.id === currentTestStepId);
     const currentPickleStep = pickle.steps.find((step: PickleStep) => step.id === currentTestStep?.pickleStepId);
     const isCurrentStepOutcome = currentPickleStep?.type === StepKeywordType.OUTCOME;
